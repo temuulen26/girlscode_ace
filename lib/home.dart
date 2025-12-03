@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'chat_page.dart';
 import 'profile_page.dart';
 import 'mbtitest.dart';
-import 'news_detail.dart'; // MBTI тестийг импортлов
+import 'careertest.dart'; // CareerTest импортлов
+import 'news_detail.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -25,14 +27,67 @@ class _HomePageState extends State<HomePage> {
       "image": "assets/career_news.jpg",
     },
     {
-      "title": "Мэдээ 2",
-      "desc": "Энэ бол мэдээний дэлгэрэнгүй агуулга 2...",
-      "image": "assets/news2.png",
+      "title": "IT-ийн хүмүүс юу хийдэг вэ?",
+      "desc":
+          "1. Software Engineer (Програм хангамжийн инженер)\n"
+          "Юу хийдэг вэ?\n"
+          "- Вэб, апп, програм хангамж бүтээнэ\n"
+          "- Код бичиж, тест хийж, засвар сайжруулалт хийнэ\n"
+          "- Шинэ систем, платформ хөгжүүлнэ\n\n"
+          "Гол чадварууд:\n"
+          "- Python, Java, Dart, JavaScript, C#\n"
+          "- Асуудал шийдэх чадвар\n"
+          "- Алгоритм, өгөгдлийн бүтэц\n\n"
+          "Ажиллах салбар:\n"
+          "- Мобайл хөгжүүлэлт, вэб хөгжүүлэлт\n"
+          "- Тоглоомын хөгжүүлэлт\n"
+          "- AI/ML програм хангамж\n\n"
+          "2. Information Technology Engineer (Мэдээллийн технологийн инженер)\n"
+          "Юу хийдэг вэ?\n"
+          "- Байгууллагын техник, системийг хариуцна\n"
+          "- Сервер, компьютер, программ суурилуулна\n"
+          "- Сүлжээ, сервер засвар, дэмжлэг үзүүлнэ\n\n"
+          "Гол чадвар:\n"
+          "- Hardware, software суурь мэдлэг\n"
+          "- Windows, Linux OS\n"
+          "- IT Support, Troubleshooting\n\n"
+          "3. Computer Network Engineer (Компьютерийн сүлжээний инженер)\n"
+          "Юу хийдэг вэ?\n"
+          "- Сүлжээ (LAN/WAN) байгуулна\n"
+          "- Router, Switch, Firewall тохируулна\n"
+          "- Сүлжээний алдаа илрүүлж засна\n\n"
+          "Гол чадвар:\n"
+          "- CCNA/CCNP мэдлэг\n"
+          "- IP addressing, routing үндэс\n"
+          "- Linux серверийн суурь\n\n"
+          "4. Cybersecurity Engineer (Кибер аюулгүй байдлын инженер)\n"
+          "Юу хийдэг вэ?\n"
+          "- Системийг халдлагаас хамгаална\n"
+          "- Pen testing хийнэ\n"
+          "- Firewall, IDS/IPS тохируулна\n"
+          "- Аюулгүй байдлын бодлого боловсруулна\n\n"
+          "Гол чадвар:\n"
+          "- Ethical hacking (Kali Linux, Metasploit)\n"
+          "- Networking\n"
+          "- Security tools (BurpSuite, Wireshark)\n"
+          "- Encryption, authentication\n\n"
+          "5. Multimedia Engineer (Мультимедиа инженер)\n"
+          "Юу хийдэг вэ?\n"
+          "- Дизайн, 2D/3D animation\n"
+          "- Видео эффект\n"
+          "- UX/UI дизайн\n"
+          "- VR/AR болон тоглоомын мультимедиа төслүүд\n\n"
+          "Гол чадвар:\n"
+          "- Photoshop, Illustrator\n"
+          "- After Effects, Premiere Pro\n"
+          "- Blender, Maya\n"
+          "- UX/UI (Figma)\n",
+      "image": "assets/news2.jpeg",
     },
     {
       "title": "Мэдээ 3",
       "desc": "Энэ бол мэдээний дэлгэрэнгүй агуулга 3...",
-      "image": "assets/news2.png",
+      "image": "assets/news2.jpeg",
     },
   ];
 
@@ -41,6 +96,13 @@ class _HomePageState extends State<HomePage> {
       "title": "MBTI Тест",
       "desc": "Таны зан төлөвийг тодорхойлно.",
       "image": "assets/mbti_test.png",
+      "type": "mbti",
+    },
+    {
+      "title": "Career Тест",
+      "desc": "Таны мэргэжлийн чиг баримжааг тодорхойлно.",
+      "image": "assets/career_test.png",
+      "type": "career",
     },
   ];
 
@@ -200,11 +262,20 @@ class _HomePageState extends State<HomePage> {
               return GestureDetector(
                 onTap: () {
                   if (isTest) {
-                    // MBTI тест рүү л шилжүүлнэ
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MbtiTestPage()),
-                    );
+                    // Тест рүү шилжүүлэх
+                    if (item["type"] == "mbti") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MbtiTestPage()),
+                      );
+                    } else if (item["type"] == "career") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CareerTestPage(),
+                        ),
+                      );
+                    }
                   } else {
                     Navigator.push(
                       context,

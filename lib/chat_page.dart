@@ -52,9 +52,20 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFA58BFF),
+        title: const Text(
+          "ACE AI Chatbot",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context), // Буцах функц
+        ),
+      ),
       body: Column(
         children: [
-          _header(),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -101,37 +112,6 @@ class _ChatPageState extends State<ChatPage> {
               child: CircularProgressIndicator(),
             ),
           _inputArea(),
-        ],
-      ),
-    );
-  }
-
-  Widget _header() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
-      decoration: const BoxDecoration(
-        color: Color(0xFFA58BFF),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(40),
-          bottomRight: Radius.circular(40),
-        ),
-      ),
-      child: Row(
-        children: const [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: Colors.white,
-            child: Icon(Icons.smart_toy, color: Colors.purple, size: 28),
-          ),
-          SizedBox(width: 12),
-          Text(
-            "ACE AI Chatbot",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
         ],
       ),
     );

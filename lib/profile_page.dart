@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'api_service.dart'; // API functions энд
+import 'api_service.dart';
+import 'chat_page.dart';
+import 'ProfileDetailPage.dart'; // ProfileDetailPage импорт
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -11,92 +13,177 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Map<String, dynamic>? userData;
-
-  // Жишээ: хэрэглэгчийн мэдээллийг авчрах функц
-  Future<void> fetchUserData() async {
-    try {
-      final response = await ApiService.loginUser("testuser", "testpassword");
-      if (response['status'] == 'success') {
-        // JSON response-д хэрэглэгчийн мэдээллийг оруулна
-        setState(() {
-          userData = {
-            'username': 'testuser', // response-аас авч болно
-            'email': 'testuser@example.com', // response-аас авч болно
-          };
-        });
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchUserData(); // Хуудас load болох үед мэдээлэл авчирна
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      final loginResponse = await ApiService.loginUser(
+        "testuser",
+        "testpassword",
+      );
+
+      print("Login Response: $loginResponse");
+
+      if (loginResponse['status'] == 'success') {
+        String username = loginResponse['username'];
+
+        final profileResponse = await ApiService.getProfile(username);
+        print("Profile Response: $profileResponse");
+
+        if (profileResponse['status'] == 'success') {
+          setState(() {
+            userData = profileResponse['profile'];
+            isLoading = false;
+          });
+        } else {
+          print("Profile API error: ${profileResponse['message']}");
+          setState(() => isLoading = false);
+        }
+      } else {
+        print("Login failed: ${loginResponse['message']}");
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      print("Fetch User Error: $e");
+      setState(() => isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _header(),
-            const SizedBox(height: 20),
-            _menuItem(
-              context: context,
-              icon: Icons.person,
-              title: "Миний мэдээлэл",
-              onTap: () {
-                // Мэдээлэл харах modal
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20),
-                    ),
-                  ),
-                  isScrollControlled: true,
-                  builder: (context) {
-                    return Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: userData == null
-                          ? const Center(child: CircularProgressIndicator())
-                          : Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Миний мэдээлэл",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text("Username: ${userData!['username']}"),
-                                const SizedBox(height: 8),
-                                Text("Email: ${userData!['email']}"),
-                                const SizedBox(height: 20),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text("Хаах"),
-                                  ),
-                                ),
-                              ],
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  _header(),
+                  const SizedBox(height: 20),
+                  _menuItem(
+                    context: context,
+                    icon: Icons.person,
+                    title: "Миний мэдээлэл",
+                    onTap: () {
+                      if (userData != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProfileDetailPage(
+                              username: userData!['username'],
                             ),
-                    );
-                  },
-                );
-              },
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Мэдээлэл хараахан ачаалагдаагүй байна",
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  _menuItem(
+                    context: context,
+                    icon: Icons.support_agent,
+                    title: "ACE AI туслах",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChatPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  _menuItem(
+                    context: context,
+                    icon: Icons.description,
+                    title: "Үйлчилгээний нөхцөл",
+                    onTap: _showTerms,
+                  ),
+                  _menuItem(
+                    context: context,
+                    icon: Icons.logout,
+                    title: "Гарах",
+                    onTap: _logoutDialog,
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
-            // Бусад menu item-ууд...
-          ],
-        ),
+    );
+  }
+
+  void _showTerms() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Үйлчилгээний нөхцөл",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                "ACE аппийг ашигласнаар та дараах нөхцлийг хүлээн зөвшөөрч байна:\n\n"
+                "1. Үйлчилгээний зорилго: Карьер, зан төлөв, мэргэжлийн зөвлөмж.\n"
+                "2. Хэрэглэгчийн үүрэг: Үнэн зөв мэдээлэл өгөх, нууц үгээ хадгалах.\n"
+                "3. Мэдээллийн нууцлал: Хувийн мэдээллийг зөвхөн үйлчилгээний зориулалтаар ашиглах.\n"
+                "4. Хариуцлага: AI зөвлөгөө зөвхөн зөвлөмж; үр дагаварт хэрэглэгч өөрөө хариуцна.\n"
+                "5. Хууль эрх зүйн шаардлага: Монгол Улсын хуульд нийцүүлэх.\n"
+                "6. Үйлчилгээний өөрчлөлт: Урьдчилан мэдэгдэхгүйгээр өөрчлөх боломжтой.\n\n"
+                "Дэлгэрэнгүй нөхцлийг бүрэн уншиж, зөвшөөрснөөр аппийг ашиглах боломжтой.",
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Хаах"),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _logoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Гарах"),
+        content: const Text("Та гарахдаа итгэлтэй байна уу?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Буцах"),
+          ),
+          TextButton(
+            onPressed: () => SystemNavigator.pop(),
+            child: const Text("Тийм", style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }
