@@ -195,8 +195,8 @@ class _ProfilePageState extends State<ProfilePage> {
       decoration: const BoxDecoration(
         color: Color(0xFFA58BFF),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(40),
-          bottomRight: Radius.circular(40),
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
         ),
       ),
       child: Column(

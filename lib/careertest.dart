@@ -103,10 +103,12 @@ class _CareerTestPageState extends State<CareerTestPage> {
     for (int i = 0; i < questions.length; i++) {
       final answer = selectedAnswers[i];
       if (answer != null) {
-        if (answer == "yes")
+        if (answer == "yes") {
           score[questions[i].keyLetter] = score[questions[i].keyLetter]! + 1;
-        if (answer == "maybe")
+        }
+        if (answer == "maybe") {
           score[questions[i].keyLetter] = score[questions[i].keyLetter]! + 0.5;
+        }
       }
     }
     bestCategory = score.keys.reduce((a, b) => score[a]! > score[b]! ? a : b);

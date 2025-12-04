@@ -1,53 +1,56 @@
-require('dotenv').config();
-const express = require('express');
-const axios = require('axios');
-const cors = require('cors');
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import Groq from "groq-sdk";
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// POST endpoint: текст генераци хийх
-app.post('/generate', async (req, res) => {
-    const prompt = req.body.prompt;
-
-    if (!prompt) {
-        return res.status(400).json({ error: 'Prompt шаардлагатай' });
-    }
-
-    try {
-        const response = await axios.post(
-            'https://api-inference.huggingface.co/routers/text-generation',
-            {
-                model: 'google/flan-t5-small',
-                inputs: prompt,
-                // optional: та хүсвэл additional options нэмэх боломжтой
-                parameters: {
-                    max_new_tokens: 150
-                }
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${process.env.HF_API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
-
-        // Hugging Face router JSON response нь массивтай ирдэг
-        const generatedText =
-            response.data?.[0]?.generated_text || 'No response from model';
-
-        res.json({ text: generatedText });
-    } catch (err) {
-        console.error(err.response?.data || err.message);
-        res.status(500).json({ error: 'Error generating text' });
-    }
+// Groq client
+const client = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
-// Орчны хувьсагч эсвэл default порт
-const SERVER_PORT = process.env.PORT || 3001;
+// AI endpoint
+app.post("/generate", async (req, res) => {
+  const prompt = req.body.prompt;
 
-app.listen(SERVER_PORT, () =>
-    console.log(`Server running on port ${SERVER_PORT}`)
-);
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt шаардлагатай!" });
+  }
+
+  try {
+    const response = await client.chat.completions.create({
+      model: "llama-3.3-70b-versatile", // хамгийн хурдан үнэгүй модель
+      messages: [
+        {
+  role: "system",
+  content: 
+    "Та бол монгол хэлээр маш товч, ойлгомжтой, энгийн, хүнийх шиг зөв, дүрмийн алдаа гаргалгүй хариулдаг зөвлөх AI. \
+Хариултанд: нуршихгүй, давтахгүй, философдохгүй, AI мэт урт тайлбар бичихгүй. \
+Хариулт ихэвчлэн 2–3 өгүүлбэрээс илүүгүй байна, заримдаа шаардлагатай үед урт байна. \
+Ердийн монгол хүн ярьдаг хэллэгээр хариул."
+},
+        { role: "user", content: prompt },
+      ],
+      max_tokens: 150,
+      temperature: 0.7,
+    });
+
+    const aiText = response.choices?.[0]?.message?.content || "Хариу алга.";
+
+    res.json({ text: aiText });
+  } catch (error) {
+    console.error("Groq Error =>", error);
+    res
+      .status(500)
+      .json({ error: "AI-с хариу авахад алдаа гарлаа.", details: error });
+  }
+});
+
+// Server run
+const PORT = 3001;
+app.listen(PORT, () => console.log("Groq AI server running on port", PORT));

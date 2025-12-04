@@ -43,88 +43,100 @@ class _SignInPageState extends State<SignInPage>
     super.dispose();
   }
 
-  // Login функц
-  void loginUser() async {
-    String username = loginUsernameController.text.trim();
-    String password = loginPasswordController.text.trim();
+  // --------------------------
+  // LOGIN FUNCTION (optimized)
+  // --------------------------
+  Future<void> loginUser() async {
+    final username = loginUsernameController.text.trim();
+    final password = loginPasswordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Username болон нууц үгээ оруулна уу")),
-      );
+      _showSnack("Username болон нууц үгээ оруулна уу");
       return;
     }
 
     setState(() => isLoading = true);
 
     try {
-      var result = await ApiService.loginUser(username, password);
-      if (result['status'] == 'success') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
+      final result = await ApiService.loginUser(username, password);
+
+      if (result["status"] == "success") {
+        // Navigation must run AFTER frame build
+        if (!mounted) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomePage()),
+          );
+        });
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(result['message'])));
+        _showSnack(result["message"] ?? "Алдаа гарлаа");
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Алдаа гарлаа: $e")));
+      _showSnack("Алдаа гарлаа: $e");
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
-  // Register функц
-  void registerUser() async {
-    String username = regUsernameController.text.trim();
-    String email = regEmailController.text.trim();
-    String password = regPasswordController.text.trim();
-    String confirmPassword = regConfirmPasswordController.text.trim();
+  // --------------------------
+  // REGISTER FUNCTION
+  // --------------------------
+  Future<void> registerUser() async {
+    final username = regUsernameController.text.trim();
+    final email = regEmailController.text.trim();
+    final password = regPasswordController.text.trim();
+    final confirmPassword = regConfirmPasswordController.text.trim();
 
     if (username.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Бүх талбарыг бөглөнө үү")));
+      _showSnack("Бүх талбарыг бөглөнө үү");
       return;
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Нууц үг хоорондоо таарахгүй байна")),
-      );
+      _showSnack("Нууц үг хоорондоо таарахгүй байна");
       return;
     }
 
     setState(() => isLoading = true);
 
     try {
-      var result = await ApiService.registerUser(username, email, password);
-      if (result['status'] == 'success') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
+      final result = await ApiService.registerUser(username, email, password);
+
+      if (result["status"] == "success") {
+        if (!mounted) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomePage()),
+          );
+        });
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(result['message'])));
+        _showSnack(result["message"] ?? "Алдаа гарлаа");
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Алдаа гарлаа: $e")));
+      _showSnack("Алдаа гарлаа: $e");
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
+  // --------------------------
+  // Snackbar function (safe)
+  // --------------------------
+  void _showSnack(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  // --------------------------
+  // LOGIN TAB UI
+  // --------------------------
   Widget _loginTab() {
     return Padding(
       padding: const EdgeInsets.all(24.0),
@@ -177,6 +189,9 @@ class _SignInPageState extends State<SignInPage>
     );
   }
 
+  // --------------------------
+  // REGISTER TAB UI
+  // --------------------------
   Widget _registerTab() {
     return Padding(
       padding: const EdgeInsets.all(24.0),
@@ -287,7 +302,10 @@ class _SignInPageState extends State<SignInPage>
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [_loginTab(), _registerTab()],
+              children: [
+                _loginTab(),
+                _registerTab(),
+              ],
             ),
           ),
         ],

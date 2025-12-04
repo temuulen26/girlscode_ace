@@ -11,7 +11,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, dynamic>> messages = [
-    {"text": "Сайн уу? Танд туслах уу?", "isUser": false},
+    {"text": "Сайн уу? Таны ACE туслах байна. Таньд юугаар туслах уу?", "isUser": false},
   ];
   bool _loading = false;
 
@@ -39,7 +39,7 @@ class _ChatPageState extends State<ChatPage> {
     } catch (e) {
       setState(() {
         messages.add({
-          "text": "AI-с зөвлөгөө авахад алдаа гарлаа.",
+          "text": "ACE-с зөвлөгөө авахад алдаа гарлаа.",
           "isUser": false,
         });
       });
@@ -56,11 +56,11 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor: const Color(0xFFA58BFF),
         title: const Text(
           "ACE AI Chatbot",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color:Colors.white ),
           onPressed: () => Navigator.pop(context), // Буцах функц
         ),
       ),
@@ -84,8 +84,8 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     decoration: BoxDecoration(
                       color: msg["isUser"]
-                          ? Colors.purple[300]
-                          : Colors.purpleAccent,
+                          ? const Color(0xFFA58BFF)
+                          : const Color.fromARGB(255, 187, 139, 255),
                       borderRadius: BorderRadius.only(
                         topLeft: const Radius.circular(16),
                         topRight: const Radius.circular(16),
@@ -145,7 +145,7 @@ class _ChatPageState extends State<ChatPage> {
           ElevatedButton(
             onPressed: _sendMessage,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.purple,
+              backgroundColor: Color(0xFFA58BFF),
               shape: const CircleBorder(),
               padding: const EdgeInsets.all(14),
             ),

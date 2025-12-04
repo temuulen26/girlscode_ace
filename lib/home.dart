@@ -4,6 +4,7 @@ import 'profile_page.dart';
 import 'mbtitest.dart';
 import 'careertest.dart'; // CareerTest импортлов
 import 'news_detail.dart';
+import 'hollandtest.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -84,11 +85,6 @@ class _HomePageState extends State<HomePage> {
           "- UX/UI (Figma)\n",
       "image": "assets/news2.jpeg",
     },
-    {
-      "title": "Мэдээ 3",
-      "desc": "Энэ бол мэдээний дэлгэрэнгүй агуулга 3...",
-      "image": "assets/news2.jpeg",
-    },
   ];
 
   final List<Map<String, String>> tests = [
@@ -104,7 +100,13 @@ class _HomePageState extends State<HomePage> {
       "image": "assets/career_test.png",
       "type": "career",
     },
-  ];
+    {
+      "title": "Holland Тест", 
+      "desc": "Сэтгэл зүйн аргаар мэргэжлийн чиг баримжааг тодорхойлно.",
+      "image": "assets/holland_test.png",
+      "type": "holland",
+               },
+      ];
 
   final List<Widget> _pages = const [
     SizedBox.shrink(), // Home page handled separately
@@ -167,12 +169,12 @@ class _HomePageState extends State<HomePage> {
 
   Widget _header() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
+      padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
       decoration: const BoxDecoration(
         color: Color(0xFFA58BFF),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(40),
-          bottomRight: Radius.circular(40),
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
         ),
       ),
       child: Column(
@@ -181,19 +183,19 @@ class _HomePageState extends State<HomePage> {
         children: [
           Row(
             children: const [
-              CircleAvatar(radius: 28, backgroundColor: Colors.white),
-              SizedBox(width: 12),
+              CircleAvatar(radius: 22, backgroundColor: Color.fromARGB(255, 255, 255, 255)),
+              SizedBox(width: 10),
               Text(
                 "ACE-д тавтай морил!",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
           TextField(
             onChanged: (value) {
               setState(() {
@@ -205,9 +207,9 @@ class _HomePageState extends State<HomePage> {
               filled: true,
               fillColor: Colors.white,
               prefixIcon: const Icon(Icons.search),
-              contentPadding: const EdgeInsets.all(12),
+              contentPadding: const EdgeInsets.symmetric(vertical: 8),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(22),
                 borderSide: BorderSide.none,
               ),
             ),
@@ -218,173 +220,177 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _section(
-    String title,
-    List<Map<String, String>> items, {
-    bool isTest = false,
-  }) {
-    final filtered = items
-        .where(
-          (e) =>
-              (e["title"]?.toLowerCase() ?? "").contains(searchText) ||
-              (e["desc"]?.toLowerCase() ?? "").contains(searchText),
-        )
-        .toList();
+  String title,
+  List<Map<String, String>> items, {
+  bool isTest = false,
+}) {
+  final filtered = items
+      .where(
+        (e) =>
+            (e["title"]?.toLowerCase() ?? "").contains(searchText) ||
+            (e["desc"]?.toLowerCase() ?? "").contains(searchText),
+      )
+      .toList();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 5),
-              Container(height: 1, color: Colors.black12),
-            ],
-          ),
+            ),
+            const SizedBox(height: 5),
+            Container(height: 1, color: Colors.black12),
+          ],
         ),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 200,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            itemCount: filtered.length,
-            itemBuilder: (context, i) {
-              final item = filtered[i];
-              return GestureDetector(
-                onTap: () {
-                  if (isTest) {
-                    // Тест рүү шилжүүлэх
-                    if (item["type"] == "mbti") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => MbtiTestPage()),
-                      );
-                    } else if (item["type"] == "career") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CareerTestPage(),
-                        ),
-                      );
-                    }
-                  } else {
+      ),
+      const SizedBox(height: 8),
+
+      SizedBox(
+        height: 200,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          itemCount: filtered.length,
+
+          itemBuilder: (context, i) {
+            final item = filtered[i];
+
+            return GestureDetector(
+              onTap: () {
+                if (isTest) {
+                  if (item["type"] == "mbti") {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => NewsDetailPage(
-                          title: item["title"] ?? "",
-                          desc: item["desc"] ?? "",
-                          image: item["image"] ?? "",
-                        ),
-                      ),
+                      MaterialPageRoute(builder: (context) => MbtiTestPage()),
+                    );
+                  } else if (item["type"] == "career") {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CareerTestPage()),
+                    );
+                  } else if (item["type"] == "holland") {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HollandTestPage()),
                     );
                   }
-                },
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 160,
-                      margin: const EdgeInsets.only(right: 15),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isTest
-                            ? Colors.purple[50]
-                            : const Color(0xFFF0E7FF),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.black26),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 4,
-                            offset: Offset(2, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (item["image"] != null &&
-                              item["image"]!.isNotEmpty)
-                            Hero(
-                              tag: item["image"]! + i.toString(),
-                              child: Container(
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  image: DecorationImage(
-                                    image: AssetImage(item["image"]!),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            )
-                          else
-                            Container(
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.black26),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.article_outlined,
-                                  size: 40,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                          const SizedBox(height: 8),
-                          Text(
-                            item["title"] ?? "",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NewsDetailPage(
+                        title: item["title"] ?? "",
+                        desc: item["desc"] ?? "",
+                        image: item["image"] ?? "",
                       ),
                     ),
-                    if (isTest)
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.purple,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Text(
-                            "Шинэ тест",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                  );
+                }
+              },
+
+              child: Stack(
+                children: [
+                  Container(
+                    width: 160,
+                    height: 150,
+                    margin: const EdgeInsets.only(right: 15),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isTest ? Colors.purple[50] : const Color(0xFFF0E7FF),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.black26),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
+                    ),
+
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (item["image"] != null && item["image"]!.isNotEmpty)
+                          Hero(
+                            tag: item["image"]! + i.toString(),
+                            child: Container(
+                              height: 80,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                image: DecorationImage(
+                                  image: AssetImage(item["image"]!),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
+                          )
+                        else
+                          Container(
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.black26),
+                            ),
+                            child: const Center(
+                              child: Icon(Icons.article_outlined,
+                                  size: 40, color: Colors.grey),
+                            ),
+                          ),
+
+                        const SizedBox(height: 8),
+
+                        Text(
+                          item["title"] ?? "",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  if (isTest)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.purple,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          "Шинэ тест",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                  ],
-                ),
-              );
-            },
-          ),
+                    ),
+                ],
+              ),
+            );
+          },
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 }
